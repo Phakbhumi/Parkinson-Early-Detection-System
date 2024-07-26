@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:gap/gap.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'display_spiral.dart';
 
 class DisplayResultWidget extends StatefulWidget {
   const DisplayResultWidget({
@@ -65,8 +66,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         final String resultString = await response.stream.bytesToString();
         if (mounted) {
           setState(() {
-            results.insert(
-                results.length, SpiralData.fromJson(jsonDecode(resultString)));
+            results.insert(results.length, SpiralData.fromJson(jsonDecode(resultString)));
           });
         }
       }
@@ -137,32 +137,11 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
                 ),
               ),
               const Gap(20),
-              for (int index = 0;
-                  index < widget.capturedImageList.length;
-                  index++)
-                Column(
-                  children: [
-                    Container(
-                      width: 300,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.black,
-                        ),
-                      ),
-                      child: Image.memory(widget.capturedImageList[index]),
-                    ),
-                    const Gap(5),
-                    Text(
-                      "ความเสี่ยงสำหรับภาพนี้: ${boolClassify(diagnosisData[index])}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Gap(20),
-                  ],
+              for (int index = 0; index < widget.capturedImageList.length; index++)
+                ViewDrawing(
+                  capturedImage: widget.capturedImageList[index],
+                  isParkinson: diagnosisData[index],
+                  index: index,
                 ),
             ],
           ),
@@ -208,9 +187,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       return;
     }
 
-    FirebaseFirestore.instance
-        .collection('spiral-diagnosis-results')
-        .add(<String, dynamic>{
+    FirebaseFirestore.instance.collection('spiral-diagnosis-results').add(<String, dynamic>{
       'time': DateTime.now().toString(),
       'uid': FirebaseAuth.instance.currentUser!.uid,
       'verdict': verdict(),
@@ -224,14 +201,6 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       return 'medium';
     } else {
       return 'healthy';
-    }
-  }
-
-  String boolClassify(bool verdict) {
-    if (verdict == true) {
-      return "เสี่ยง";
-    } else {
-      return "ไม่เสี่ยง";
     }
   }
 }
