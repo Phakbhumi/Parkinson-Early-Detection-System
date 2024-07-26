@@ -105,22 +105,35 @@ class _DrawingState extends State<Drawing> {
                 ),
                 const Gap(30),
                 Container(
+                  width: 300,
+                  height: 300,
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1,
                       color: Colors.black,
                     ),
                   ),
-                  child: Screenshot(
-                    controller: screenshotController,
-                    child: sketchAreaContainer,
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        'assets/images/spiral.png',
+                        fit: BoxFit.cover,
+                      ),
+                      Screenshot(
+                        controller: screenshotController,
+                        child: sketchAreaContainer,
+                      ),
+                    ],
                   ),
                 ),
                 const Gap(20),
                 ElevatedButton(
                   onPressed: () {
-                    screenshotController.capture(delay: const Duration(milliseconds: 10)).then((capturedImage) async {
-                      capturedImageList.insert(capturedImageList.length, capturedImage!);
+                    screenshotController
+                        .capture(delay: const Duration(milliseconds: 10))
+                        .then((capturedImage) async {
+                      capturedImageList.insert(
+                          capturedImageList.length, capturedImage!);
                       if (pictureCount == 3) {
                         await showResult(capturedImageList);
                         capturedImageList.clear();

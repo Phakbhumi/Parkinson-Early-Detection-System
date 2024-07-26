@@ -31,6 +31,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
   bool isFetchingData = true;
   bool isFetchingSuccessful = false;
   bool isSpiral = true;
+  List<bool> diagnosisData = [];
   int parkinsonCount = 0;
 
   void initVal() async {
@@ -48,7 +49,8 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       for (Uint8List image in widget.capturedImageList) {
         await file.writeAsBytes(image);
         var request = http.MultipartRequest('POST', Uri.parse(spiralURL))
-          ..files.add(await http.MultipartFile.fromPath('file', '${tempDir.path}/image.jpg'));
+          ..files.add(await http.MultipartFile.fromPath(
+              'file', '${tempDir.path}/image.jpg'));
         var response = await request.send();
         if (response.statusCode != 200) {
           log("HTTP error: ${response.statusCode}");
@@ -64,7 +66,8 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         final String resultString = await response.stream.bytesToString();
         if (mounted) {
           setState(() {
-            results.insert(results.length, SpiralData.fromJson(jsonDecode(resultString)));
+            results.insert(
+                results.length, SpiralData.fromJson(jsonDecode(resultString)));
           });
         }
       }
@@ -73,6 +76,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         if (result.isSpiral == false) {
           isSpiral = false;
         }
+        diagnosisData.insert(diagnosisData.length, result.isParkinson);
         if (result.isParkinson == true) {
           parkinsonCount++;
         }
@@ -113,26 +117,56 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
           ),
         );
       } else if (isSpiral == true) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "ผลตรวจ: ${Classifier().verdictClassify(verdict())}",
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.primary,
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "ผลตรวจ: ${Classifier().verdictClassify(verdict())}",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-            ),
-            const Gap(10),
-            Text(
-              "จำนวนภาพที่มีความเสี่ยง: $parkinsonCount",
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.primary,
+              const Gap(10),
+              Text(
+                "จำนวนภาพที่มีความเสี่ยง: $parkinsonCount",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-            ),
-          ],
+              const Gap(20),
+              for (int index = 0;
+                  index < widget.capturedImageList.length;
+                  index++)
+                Column(
+                  children: [
+                    Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 1,
+                          color: Colors.black,
+                        ),
+                      ),
+                      child: Image.memory(widget.capturedImageList[index]),
+                    ),
+                    const Gap(5),
+                    Text(
+                      "ความเสี่ยงสำหรับภาพนี้: ${boolClassify(diagnosisData[index])}",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const Gap(20),
+                  ],
+                ),
+            ],
+          ),
         );
       } else {
         return Text(
@@ -175,7 +209,9 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       return;
     }
 
-    FirebaseFirestore.instance.collection('spiral-diagnosis-results').add(<String, dynamic>{
+    FirebaseFirestore.instance
+        .collection('spiral-diagnosis-results')
+        .add(<String, dynamic>{
       'time': DateTime.now().toString(),
       'uid': FirebaseAuth.instance.currentUser!.uid,
       'verdict': verdict(),
@@ -189,6 +225,14 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       return 'medium';
     } else {
       return 'healthy';
+    }
+  }
+
+  String boolClassify(bool verdict) {
+    if (verdict == true) {
+      return "เสี่ยง";
+    } else {
+      return "ไม่เสี่ยง";
     }
   }
 }

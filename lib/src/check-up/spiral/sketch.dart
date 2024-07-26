@@ -19,7 +19,7 @@ class SketchArea extends StatelessWidget {
       height: 300,
       margin: const EdgeInsets.all(1),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
       ),
       child: GestureDetector(
         onPanUpdate: (DragUpdateDetails details) {
@@ -33,10 +33,6 @@ class SketchArea extends StatelessWidget {
             CustomPaint(
               painter: Sketcher(points),
               child: Container(),
-            ),
-            Image.asset(
-              'assets/images/spiral.png',
-              fit: BoxFit.cover,
             ),
           ],
         ),
