@@ -57,7 +57,9 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       var response = await request.send().timeout(const Duration(seconds: 30));
       if (response.statusCode != 200) {
         if (mounted) {
-          isFetchingData = false;
+          setState(() {
+            isFetchingData = false;
+          });
         }
         widget.onLoadingComplete();
         log("HTTP error: ${response.statusCode}");

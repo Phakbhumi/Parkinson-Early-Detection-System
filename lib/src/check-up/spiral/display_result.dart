@@ -49,9 +49,8 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       for (Uint8List image in widget.capturedImageList) {
         await file.writeAsBytes(image);
         var request = http.MultipartRequest('POST', Uri.parse(spiralURL))
-          ..files.add(await http.MultipartFile.fromPath(
-              'file', '${tempDir.path}/image.jpg'));
-        var response = await request.send();
+          ..files.add(await http.MultipartFile.fromPath('file', '${tempDir.path}/image.jpg'));
+        var response = await request.send().timeout(const Duration(seconds: 30));
         if (response.statusCode != 200) {
           log("HTTP error: ${response.statusCode}");
           if (mounted) {
