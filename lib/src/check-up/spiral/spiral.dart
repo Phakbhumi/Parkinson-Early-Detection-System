@@ -87,7 +87,7 @@ class _DrawingState extends State<Drawing> {
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/light_green_background.avif"),
+              image: AssetImage("assets/images/light_green_background.png"),
               fit: BoxFit.cover,
             ),
           ),
@@ -129,11 +129,8 @@ class _DrawingState extends State<Drawing> {
                 const Gap(20),
                 ElevatedButton(
                   onPressed: () {
-                    screenshotController
-                        .capture(delay: const Duration(milliseconds: 10))
-                        .then((capturedImage) async {
-                      capturedImageList.insert(
-                          capturedImageList.length, capturedImage!);
+                    screenshotController.capture(delay: const Duration(milliseconds: 10)).then((capturedImage) async {
+                      capturedImageList.insert(capturedImageList.length, capturedImage!);
                       if (pictureCount == 3) {
                         await showResult(capturedImageList);
                         capturedImageList.clear();

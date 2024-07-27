@@ -76,7 +76,7 @@ class _ParkinsonsFormState extends State<ParkinsonsForm> {
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/light_green_background.avif"),
+              image: AssetImage("assets/images/light_green_background.png"),
               fit: BoxFit.cover,
             ),
           ),
