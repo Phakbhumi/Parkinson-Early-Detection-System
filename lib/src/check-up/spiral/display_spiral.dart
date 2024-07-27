@@ -22,7 +22,7 @@ class ViewDrawing extends StatefulWidget {
 }
 
 class _ViewDrawingState extends State<ViewDrawing> {
-  int downloadState = 3; // 0 - not download, 1 - start download, 2 - finish download, 3 - error
+  int downloadState = 0; // 0 - not download, 1 - start download, 2 - finish download, 3 - error
 
   Future<void> saveImage() async {
     if (downloadState != 0) return;
