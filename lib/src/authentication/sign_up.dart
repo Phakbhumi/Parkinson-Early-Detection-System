@@ -1,10 +1,7 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
+import 'package:parkinson_detection/src/authentication/auth_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -14,7 +11,6 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -22,51 +18,27 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _isLoading = false;
 
   Future<void> _signUp() async {
-    if (_displayNameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
+    if (_isLoading == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
+        const SnackBar(content: Text('กรุณาอย่ากดรัวเกินไป')),
       );
-      return;
-    }
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('รหัสผ่านไม่ตรงกัน')),
-      );
-      return;
     }
     setState(() {
       _isLoading = true;
     });
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+    String response = await Auth().signUp(
+      _displayNameController.text,
+      _emailController.text,
+      _passwordController.text,
+      _confirmPasswordController.text,
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response)),
       );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('สร้างบัญชีใหม่สำเร็จ')),
-        );
-        FirebaseFirestore.instance.collection('user-info').add(<String, dynamic>{
-          'display-name': _displayNameController.text,
-          'email': _emailController.text,
-          'uid': FirebaseAuth.instance.currentUser!.uid,
-        });
-        context.go('/');
-      }
-    } on FirebaseAuthException catch (e) {
-      log("${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorClassify(e.message))),
-        );
-      }
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -177,20 +149,5 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
-  }
-
-  String errorClassify(String? eMessage) {
-    switch (eMessage) {
-      case "\"dev.flutter.pigeon.firebase_auth_platform_interface.FirebaseAuthHostApi.createUserWithEmailAndPassword\".":
-        return "กรุณากรอกข้อมูลให้ครบถ้วน";
-      case "The email address is badly formatted.":
-        return "กรุณากรอกอีเมลให้ถูกต้อง";
-      case "The email address is already in use by another account.":
-        return "อีเมลนี้ได้ถูกใช้แล้ว";
-      case "Password should be at least 6 characters":
-        return "รหัสผ่านควรมีอย่างน้อย 6 อักขระ";
-      default:
-        return "เกิดข้อผิดพลาดในการสร้างบัญชี";
-    }
   }
 }

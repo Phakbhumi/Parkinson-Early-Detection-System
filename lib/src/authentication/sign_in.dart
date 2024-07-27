@@ -1,6 +1,5 @@
-import 'dart:developer';
+import 'auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,35 +11,25 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _signInWithEmailPassword() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_isLoading == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณากรอกอีเมลและรหัสผ่าน')),
+        const SnackBar(content: Text('กรุณาอย่ากดรัวเกินไป')),
       );
     }
     setState(() {
       _isLoading = true;
     });
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      log("${e.message}");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorClassify(e.message))),
-        );
-      }
-      setState(() {
-        _isLoading = false;
-      });
+    String response = await Auth().signIn(_emailController.text, _passwordController.text);
+    setState(() {
+      _isLoading = false;
+    });
+    if (mounted && response.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response)));
     }
   }
 
@@ -137,18 +126,5 @@ class _SignInPageState extends State<SignInPage> {
         ),
       ),
     );
-  }
-
-  String errorClassify(String? eMessage) {
-    switch (eMessage) {
-      case "\"dev.flutter.pigeon.firebase_auth_platform_interface.FirebaseAuthHostApi.signInWithEmailAndPassword\".":
-        return "กรุณากรอกอีเมลและรหัสผ่าน";
-      case "The email address is badly formatted.":
-        return "กรุณากรอกอีเมลให้ถูกต้อง";
-      case "The supplied auth credential is incorrect, malformed or has expired.":
-        return "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
-      default:
-        return "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
-    }
   }
 }
