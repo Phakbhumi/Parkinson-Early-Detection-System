@@ -80,9 +80,7 @@ class CheckMethod extends StatelessWidget {
         bottom: 5.0,
       ),
       child: InkWell(
-        onTap: () {
-          showConfermation();
-        },
+        onTap: () => context.push(path),
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -123,78 +121,6 @@ class CheckMethod extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void showConfermation() {
-    showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        titlePadding: const EdgeInsets.all(10.0),
-        actionsAlignment: MainAxisAlignment.center,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Icon(
-                icons,
-                size: 45,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            SizedBox(
-              width: 200,
-              height: 30,
-              child: Text(
-                name,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'คุณต้องการเล่นหรือไม่',
-          style: TextStyle(
-            fontSize: 18,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(
-              'ไม่ต้องการ',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.push(path);
-            },
-            child: Text(
-              'ต้องการ',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
       ),
     );
   }

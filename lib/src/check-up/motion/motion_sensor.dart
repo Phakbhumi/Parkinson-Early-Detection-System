@@ -81,7 +81,6 @@ class _HandVibrationMeasureState extends State<HandVibrationMeasure> {
 
   void initWidget() async {
     if (mounted) {
-      // ignore: use_build_context_synchronously
       await Future.delayed(Duration.zero, () => Dialogue().diagnosisInstruction(context));
     }
     setState(() {
@@ -189,6 +188,21 @@ class _HandVibrationMeasureState extends State<HandVibrationMeasure> {
                     child: const TargetView(),
                   ),
                   Positioned(
+                    top: 20,
+                    left: 0,
+                    right: 0,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        "ผลการตรวจ: ${progressPercent()}%",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
                     left: displayWidth(screenWidth),
                     top: displayHeight(screenHeight),
                     child: Container(
@@ -231,5 +245,10 @@ class _HandVibrationMeasureState extends State<HandVibrationMeasure> {
         ],
       ),
     );
+  }
+
+  String progressPercent() {
+    double dataPointsCollected = collectedData.length / 10;
+    return dataPointsCollected.toStringAsFixed(2);
   }
 }

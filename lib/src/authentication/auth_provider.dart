@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:parkinson_detection/data/connect.dart';
 import 'dart:developer';
 
 class Auth {
@@ -9,6 +10,10 @@ class Auth {
   Future<String> signIn(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
       return 'กรุณากรอกอีเมลและรหัสผ่าน';
+    }
+    bool isConnected = await Connectivity().hasInternetConnection();
+    if (isConnected == false) {
+      return 'กรุณาเชื่อมต่ออินเตอร์เน็ต หรือสัญญานอินเตอร์เน็ตไม่แรงพอ';
     }
     try {
       await _auth.signInWithEmailAndPassword(
@@ -29,6 +34,10 @@ class Auth {
     }
     if (password != passwordConfirmation) {
       return 'รหัสผ่านไม่ตรงกัน';
+    }
+    bool isConnected = await Connectivity().hasInternetConnection();
+    if (isConnected == false) {
+      return 'กรุณาเชื่อมต่ออินเตอร์เน็ต';
     }
     try {
       await _auth.createUserWithEmailAndPassword(

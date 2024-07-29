@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:parkinson_detection/data/connect.dart';
 import 'package:parkinson_detection/src/check-up/motion/data_provider.dart';
@@ -27,6 +28,7 @@ class DisplayResultWidget extends StatefulWidget {
 class _DisplayResultWidgetState extends State<DisplayResultWidget> {
   bool isFetchingData = true;
   bool isFetchingSuccessful = false;
+  bool confirmedConnection = false;
   String verdict = "";
 
   String parseAsString() {
@@ -48,6 +50,9 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         }
         return;
       }
+      setState(() {
+        confirmedConnection = true;
+      });
       String motionURL = 'https://seensiravit-demo-app.hf.space/predict_shake/';
       final tempDir = await getTemporaryDirectory();
       File file = await File('${tempDir.path}/data.txt').create();
@@ -59,6 +64,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         if (mounted) {
           setState(() {
             isFetchingData = false;
+            isFetchingSuccessful = false;
           });
         }
         widget.onLoadingComplete();
@@ -78,6 +84,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
       if (mounted) {
         setState(() {
           isFetchingData = false;
+          isFetchingSuccessful = false;
         });
       }
       widget.onLoadingComplete();
@@ -111,13 +118,21 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
               textAlign: TextAlign.center,
             );
     } else {
-      return Row(
+      return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           LoadingAnimationWidget.staggeredDotsWave(
             color: Theme.of(context).colorScheme.primary,
             size: 75,
+          ),
+          const Gap(20),
+          Text(
+            confirmedConnection ? "กำลังส่งข้อมูล..." : "กำลังตรวจสอบสถานะอินเตอร์เน็ต",
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
         ],
       );

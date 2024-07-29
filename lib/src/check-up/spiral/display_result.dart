@@ -31,6 +31,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
   List<SpiralData> results = [];
   bool isFetchingData = true;
   bool isFetchingSuccessful = false;
+  bool confirmedConnection = false;
   bool isSpiral = true;
   List<bool> diagnosisData = [];
   int parkinsonCount = 0;
@@ -44,6 +45,9 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         }
         return;
       }
+      setState(() {
+        confirmedConnection = true;
+      });
       String spiralURL = 'https://seensiravit-demo-app.hf.space/predict/';
       final tempDir = await getTemporaryDirectory();
       File file = await File('${tempDir.path}/image.jpg').create();
@@ -62,7 +66,6 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
           }
           return;
         }
-        log("Fetching ${results.length + 1}: complete");
         final String resultString = await response.stream.bytesToString();
         if (mounted) {
           setState(() {
@@ -71,7 +74,6 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         }
       }
       for (SpiralData result in results) {
-        log(result.isSpiral.toString());
         if (result.isSpiral == false) {
           isSpiral = false;
         }
@@ -148,7 +150,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
         );
       } else {
         return Text(
-          "รูปที่คุณวาด อาจไม่ตรงกับภาพร่าง กรุณาวาดรูปไหม่",
+          "รูปที่คุณวาด อาจไม่ตรงกับภาพร่าง กรุณาวาดรูปใหม่",
           style: TextStyle(
             fontSize: 16,
             color: Theme.of(context).colorScheme.primary,
@@ -167,7 +169,7 @@ class _DisplayResultWidgetState extends State<DisplayResultWidget> {
           ),
           const Gap(20),
           Text(
-            "กำลังตรวจ: ${results.length + 1}/3",
+            confirmedConnection ? "กำลังตรวจ: ${results.length + 1}/3" : "กำลังตรวจสอบสถานะอินเตอร์เน็ต",
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context).colorScheme.primary,

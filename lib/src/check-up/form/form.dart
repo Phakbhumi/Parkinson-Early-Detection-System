@@ -145,13 +145,28 @@ class _ParkinsonsFormState extends State<ParkinsonsForm> {
             ),
           ),
         ),
-        content: Text(
-          "ผลตรวจ: ${Classifier().verdictClassify(verdict)}",
-          style: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          textAlign: TextAlign.center,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "ผลตรวจ: ${Classifier().verdictClassify(verdict)}",
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const Gap(10),
+            Text(
+              "คะแนนการตรวจ (ยิ่งน้อย ยิ่งดี): $yesCount/20",
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
         actions: <Widget>[
           ElevatedButton(

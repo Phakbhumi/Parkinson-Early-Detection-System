@@ -76,9 +76,7 @@ class _AccountViewState extends State<AccountView> {
           ),
           const Gap(20),
           FilledButton(
-            onPressed: () {
-              signOutConfirmation();
-            },
+            onPressed: () => signOutConfirmation,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
