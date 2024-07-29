@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parkinson_detection/data/results_provider.dart';
-import 'package:parkinson_detection/data/display_provider.dart';
+import 'package:parkinson_detection/src/authentication/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'check-up/check_up.dart';
 import 'report/data_preview.dart';
@@ -23,7 +23,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       vsync: this,
     );
     context.read<DiagnosisDataProvider>().fetchData();
-    context.read<DisplaynameProvider>().fetchDisplayName();
+    context.read<AuthDataProvider>().fetchDisplayName();
     super.initState();
   }
 

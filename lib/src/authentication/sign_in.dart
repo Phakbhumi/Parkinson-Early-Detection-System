@@ -1,7 +1,9 @@
+import 'package:parkinson_detection/src/components/error_handler.dart';
 import 'auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -24,12 +26,12 @@ class _SignInPageState extends State<SignInPage> {
     setState(() {
       _isLoading = true;
     });
-    String response = await Auth().signIn(_emailController.text, _passwordController.text);
+    String? response = await context.read<AuthDataProvider>().signIn(_emailController.text, _passwordController.text);
     setState(() {
       _isLoading = false;
     });
-    if (mounted && response.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response)));
+    if (mounted && response != null) {
+      ErrorHandler().showErrorDialogue(context, response);
     }
   }
 

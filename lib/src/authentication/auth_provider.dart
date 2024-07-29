@@ -1,13 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parkinson_detection/data/connect.dart';
 import 'dart:developer';
 
-class Auth {
+class AuthDataProvider extends ChangeNotifier {
+  final isLoggedIn = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  String displayName = "";
+
   // return error message (response)
-  Future<String> signIn(String email, String password) async {
+  Future<String?> signIn(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
       return 'กรุณากรอกอีเมลและรหัสผ่าน';
     }
@@ -24,11 +28,12 @@ class Auth {
       log(e.toString());
       return signInErrorClassify(e.toString());
     }
-    return "";
+    fetchDisplayName();
+    return null;
   }
 
   //return error message (response)
-  Future<String> signUp(String displayName, String email, String password, String passwordConfirmation) async {
+  Future<String?> signUp(String displayName, String email, String password, String passwordConfirmation) async {
     if (displayName.isEmpty || email.isEmpty || password.isEmpty || passwordConfirmation.isEmpty) {
       return 'กรุณากรอกข้อมูลให้ครบถ้วน';
     }
@@ -49,11 +54,31 @@ class Auth {
         'email': email,
         'uid': FirebaseAuth.instance.currentUser!.uid,
       });
-      return 'สร้างบัญชีใหม่สำเร็จ';
+      fetchDisplayName();
+      return null;
     } catch (e) {
       log(e.toString());
       return signUpErrorClassify(e.toString());
     }
+  }
+
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+    displayName = "";
+  }
+
+  void fetchDisplayName() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection("user-info").where('uid', isEqualTo: user!.uid).limit(1).get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      displayName = querySnapshot.docs.first['display-name'];
+    } else {
+      displayName = "ไม่ทราบ";
+    }
+    notifyListeners();
   }
 
   String signInErrorClassify(String? eMessage) {

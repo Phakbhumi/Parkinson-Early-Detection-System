@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
 import 'package:parkinson_detection/src/authentication/auth_provider.dart';
+import 'package:parkinson_detection/src/components/error_handler.dart';
+import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -19,26 +21,22 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signUp() async {
     if (_isLoading == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณาอย่ากดรัวเกินไป')),
-      );
+      ErrorHandler().showErrorDialogue(context, 'กรุณาอย่ากดรัวเกินไป');
     }
     setState(() {
       _isLoading = true;
     });
-    String response = await Auth().signUp(
-      _displayNameController.text,
-      _emailController.text,
-      _passwordController.text,
-      _confirmPasswordController.text,
-    );
+    String? response = await context.read<AuthDataProvider>().signUp(
+          _displayNameController.text,
+          _emailController.text,
+          _passwordController.text,
+          _confirmPasswordController.text,
+        );
     setState(() {
       _isLoading = false;
     });
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response)),
-      );
+    if (mounted && response != null) {
+      ErrorHandler().showErrorDialogue(context, response);
     }
   }
 

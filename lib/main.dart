@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'data/display_provider.dart';
+import 'src/authentication/auth_provider.dart';
 import 'route/router.dart';
 import 'package:provider/provider.dart';
 import 'data/firebase_options.dart';
@@ -20,7 +20,7 @@ void main() async {
           create: (context) => DiagnosisDataProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => DisplaynameProvider(),
+          create: (context) => AuthDataProvider(),
         ),
       ],
       child: const MyApp(),

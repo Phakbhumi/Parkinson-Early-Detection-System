@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider, PhoneAuthProvider;
-import 'package:parkinson_detection/data/display_provider.dart';
+import 'package:parkinson_detection/src/authentication/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,6 +13,8 @@ class AccountView extends StatefulWidget {
 }
 
 class _AccountViewState extends State<AccountView> {
+  bool _isSignOut = false;
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -33,7 +35,7 @@ class _AccountViewState extends State<AccountView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "ชื่อบัญชี: ${context.read<DisplaynameProvider>().displayName}",
+                "ชื่อบัญชี: ${context.read<AuthDataProvider>().displayName}",
                 style: TextStyle(
                   fontSize: 18,
                   color: Theme.of(context).colorScheme.primary,
@@ -76,7 +78,7 @@ class _AccountViewState extends State<AccountView> {
           ),
           const Gap(20),
           FilledButton(
-            onPressed: () => signOutConfirmation,
+            onPressed: () => signOutConfirmation(),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -114,6 +116,7 @@ class _AccountViewState extends State<AccountView> {
               ),
               textAlign: TextAlign.center,
             ),
+            content: _isSignOut ? const CircularProgressIndicator() : const SizedBox(),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,9 +140,18 @@ class _AccountViewState extends State<AccountView> {
                   Expanded(
                     flex: 1,
                     child: TextButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        Navigator.of(context).pop();
+                      onPressed: () async {
+                        if (_isSignOut == true) return;
+                        setState(() {
+                          _isSignOut = true;
+                        });
+                        await context.read<AuthDataProvider>().signOut();
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                        setState(() {
+                          _isSignOut = false;
+                        });
                       },
                       child: Text(
                         "ต้องการ",

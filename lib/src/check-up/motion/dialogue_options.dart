@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:parkinson_detection/src/check-up/motion/data_provider.dart';
+import 'package:parkinson_detection/src/components/error_handler.dart';
 import 'display_result.dart';
 import 'package:go_router/go_router.dart';
 
@@ -110,7 +111,7 @@ class Dialogue {
                     flex: 1,
                     child: TextButton(
                       onPressed: () {
-                        sendData(collectedData);
+                        sendData(context, collectedData);
                         Navigator.pop(context);
                         diagnosisResults(context, collectedData);
                       },
@@ -179,13 +180,13 @@ class Dialogue {
     );
   }
 
-  void sendData(List<VibrationData> collectedData) {
+  void sendData(BuildContext context, List<VibrationData> collectedData) {
     if (FirebaseAuth.instance.currentUser == null) {
-      throw Exception('Must be logged in');
+      ErrorHandler().showErrorDialogue(context, "ไม่สามารถบันทึกข้อมูลได้");
     }
 
     if (collectedData.isEmpty) {
-      throw Exception('No data');
+      ErrorHandler().showErrorDialogue(context, "ไม่สามารถบันทึกข้อมูลได้");
     }
 
     String parsedData = '[ ';
