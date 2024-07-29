@@ -49,7 +49,7 @@ Currently, PA-DE is available exclusively for Android, but we have plans to expa
 
 For the offical version: visit our [AI model repository](https://github.com/seensiravit/PA-DE)
 
-For the latest version: download apk-release.apk file from this repository
+For the latest version: download apk-release.apk file in build-apk directory
 
 ## 🙌 Contributors
 
