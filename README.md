@@ -22,6 +22,8 @@ Users balance a ball in the middle of the screen using their hands for a set amo
 
 Users draw three spirals on the screen with their finger. The drawing is first checked to ensure it resembles a spiral, and then evaluated based on the shaking of the strokes. This assessment is powered by our AI models.
 
+For further info on our AI models, check out our [AI model repository](https://github.com/seensiravit/PA-DE)
+
 ### เล่าสู่กันฟัง 
 
 Users answer 20 questions designed to assess their severity level of Parkinson's disease.
