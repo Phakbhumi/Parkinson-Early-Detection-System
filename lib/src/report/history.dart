@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:parkinson_detection/src/components/no_data.dart';
+import 'package:parkinson_detection/data/no_data_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:parkinson_detection/data/results_provider.dart';
 import 'package:parkinson_detection/src/classifier.dart';

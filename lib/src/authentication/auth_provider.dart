@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider, PhoneAuthProvider;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parkinson_detection/data/connect.dart';
@@ -9,9 +9,10 @@ class AuthDataProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String displayName = "";
+  String email = "";
 
   // return error message (response)
-  Future<String?> signIn(String email, String password) async {
+  Future<String?> signInWithEmailPassword(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
       return 'กรุณากรอกอีเมลและรหัสผ่าน';
     }
@@ -28,7 +29,7 @@ class AuthDataProvider extends ChangeNotifier {
       log(e.toString());
       return signInErrorClassify(e.toString());
     }
-    fetchDisplayName();
+    fetchDisplayNameAndEmail();
     return null;
   }
 
@@ -54,7 +55,7 @@ class AuthDataProvider extends ChangeNotifier {
         'email': email,
         'uid': FirebaseAuth.instance.currentUser!.uid,
       });
-      fetchDisplayName();
+      fetchDisplayNameAndEmail();
       return null;
     } catch (e) {
       log(e.toString());
@@ -62,21 +63,37 @@ class AuthDataProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> signInAsGuest() async {
+    bool isConnected = await Connectivity().hasInternetConnection();
+    if (isConnected == false) {
+      return 'กรุณาเชื่อมต่ออินเตอร์เน็ต';
+    }
+    try {
+      await _auth.signInAnonymously();
+      return null;
+    } catch (_) {
+      return "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
+    }
+  }
+
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
     displayName = "";
+    email = "";
   }
 
-  void fetchDisplayName() async {
+  void fetchDisplayNameAndEmail() async {
     final User? user = FirebaseAuth.instance.currentUser;
 
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection("user-info").where('uid', isEqualTo: user!.uid).limit(1).get();
 
-    if (querySnapshot.docs.isNotEmpty) {
+    if (querySnapshot.docs.isNotEmpty && FirebaseAuth.instance.currentUser!.isAnonymous == false) {
       displayName = querySnapshot.docs.first['display-name'];
+      email = querySnapshot.docs.first['email'];
     } else {
       displayName = "ไม่ทราบ";
+      email = "ไม่ทราบ";
     }
     notifyListeners();
   }

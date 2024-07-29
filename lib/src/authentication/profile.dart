@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider, PhoneAuthProvider;
 import 'package:parkinson_detection/src/authentication/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +43,7 @@ class _AccountViewState extends State<AccountView> {
               ),
               const Gap(10),
               Text(
-                "อีเมล: ${FirebaseAuth.instance.currentUser!.email}",
+                "อีเมล: ${context.read<AuthDataProvider>().email}",
                 style: TextStyle(
                   fontSize: 18,
                   color: Theme.of(context).colorScheme.primary,
@@ -116,7 +116,17 @@ class _AccountViewState extends State<AccountView> {
               ),
               textAlign: TextAlign.center,
             ),
-            content: _isSignOut ? const CircularProgressIndicator() : const SizedBox(),
+            content: _isSignOut
+                ? const CircularProgressIndicator()
+                : FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? Text(
+                        "คำเตือน: ข้อมูลการตรวจทั้งหมดของคุณจะหายไป",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      )
+                    : const SizedBox(),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

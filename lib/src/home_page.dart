@@ -23,7 +23,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       vsync: this,
     );
     context.read<DiagnosisDataProvider>().fetchData();
-    context.read<AuthDataProvider>().fetchDisplayName();
+    context.read<AuthDataProvider>().fetchDisplayNameAndEmail();
     super.initState();
   }
 

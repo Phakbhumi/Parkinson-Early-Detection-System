@@ -15,21 +15,41 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
+  bool _isSignInWithEmailPasswordLoad = false;
+  bool _isSignInAsGuestLoad = false;
 
   Future<void> _signInWithEmailPassword() async {
-    if (_isLoading == true) {
+    if (_isSignInWithEmailPasswordLoad == true || _isSignInAsGuestLoad == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณาอย่ากดรัวเกินไป')),
+        const SnackBar(content: Text('กรุณาอย่ากดปุ่มรัวเกินไป')),
       );
     }
     setState(() {
-      _isLoading = true;
+      _isSignInWithEmailPasswordLoad = true;
     });
-    String? response = await context.read<AuthDataProvider>().signIn(_emailController.text, _passwordController.text);
+    String? response = await context.read<AuthDataProvider>().signInWithEmailPassword(
+          _emailController.text,
+          _passwordController.text,
+        );
     setState(() {
-      _isLoading = false;
+      _isSignInWithEmailPasswordLoad = false;
     });
+    if (mounted && response != null) {
+      ErrorHandler().showErrorDialogue(context, response);
+    }
+    _isSignInWithEmailPasswordLoad = false;
+  }
+
+  Future<void> _signInAsGuest() async {
+    if (_isSignInWithEmailPasswordLoad == true || _isSignInAsGuestLoad == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('กรุณาอย่ากดปุ่มรัวเกินไป')),
+      );
+    }
+    setState(() {
+      _isSignInAsGuestLoad = true;
+    });
+    String? response = await context.read<AuthDataProvider>().signInAsGuest();
     if (mounted && response != null) {
       ErrorHandler().showErrorDialogue(context, response);
     }
@@ -96,7 +116,7 @@ class _SignInPageState extends State<SignInPage> {
                     obscureText: true,
                   ),
                   const Gap(16),
-                  _isLoading
+                  _isSignInWithEmailPasswordLoad
                       ? const CircularProgressIndicator()
                       : ElevatedButton(
                           onPressed: _signInWithEmailPassword,
@@ -121,6 +141,23 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                   ),
+                  TextButton.icon(
+                    onPressed: _signInAsGuest,
+                    icon: _isSignInAsGuestLoad ? const SizedBox() : const Icon(Icons.account_circle),
+                    label: _isSignInAsGuestLoad
+                        ? const SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(),
+                          )
+                        : Text(
+                            'เข้าสู่ระบบในฐานะแขก',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                  )
                 ],
               ),
             ),
