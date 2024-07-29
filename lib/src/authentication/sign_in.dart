@@ -37,7 +37,6 @@ class _SignInPageState extends State<SignInPage> {
     if (mounted && response != null) {
       ErrorHandler().showErrorDialogue(context, response);
     }
-    _isSignInWithEmailPasswordLoad = false;
   }
 
   Future<void> _signInAsGuest() async {
@@ -53,6 +52,9 @@ class _SignInPageState extends State<SignInPage> {
     if (mounted && response != null) {
       ErrorHandler().showErrorDialogue(context, response);
     }
+    setState(() {
+      _isSignInAsGuestLoad = false;
+    });
   }
 
   @override
